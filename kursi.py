@@ -1,10 +1,7 @@
 #! /usr/bin/env python3
 # coding: utf-8
-import requests
 from telegram.ext import Updater
 from telegram.ext import CommandHandler
-from lxml import html
-from datetime import date, timedelta
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
