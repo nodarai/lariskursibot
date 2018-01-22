@@ -8,50 +8,17 @@ from datetime import date, timedelta
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
-from utils.subscribers import Subscriber, Base
 from functools import partial
+from utils.subscribers import Subscriber, Base
+from utils.currency import Currency
 
 
 from os import environ as env;TOKEN=env.get("KURSIBOT_TOKEN")
 CURRENCIES = ("USD","EUR")
-URL = "https://www.nbg.gov.ge/index.php"
-DB_FILE = "kursi_subscribers.db"
-QUERYSTRING = {"m":"582", "lng":"geo"}
-PAYLOAD = {
-        "action": "search",
-        "date_end": "",
-        "date_start":"",
-        "item": "",
-        "x":40,
-        "y":8
-    }
-HEADERS = {
-    'origin': "https://www.nbg.gov.ge",
-    'upgrade-insecure-requests': "1",
-    'content-type': "application/x-www-form-urlencoded",
-    'user-agent': "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.108 Safari/537.36",
-    'accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-    'referer': "https://www.nbg.gov.ge/index.php?m=582&lng=geo",
-    'accept-encoding': "gzip, deflate, br",
-    'accept-language': "en-US,en;q=0.9,fr;q=0.8",
-    'cookie': "PHPSESSID=ailnfffso3pahubdtpfn86dk11",
-    'cache-control': "no-cache"
-    }
 
-def get_date(num=0):
-    return date.today() + timedelta(days=num)
-
-def get_kursi(currency="EUR"):
-    print("Getting kursi")
-    yesterday_ = get_date(-1).strftime("%Y-%m-%d")
-    tomorrow_ = get_date(1).strftime("%Y-%m-%d")
-    PAYLOAD["item"] = currency
-    PAYLOAD["date_start"] = yesterday_
-    PAYLOAD["date_end"] = tomorrow_
-    response = requests.request("POST", URL, data=PAYLOAD, headers=HEADERS, params=QUERYSTRING)
-    root = html.fromstring(response.text)
-    result = root.xpath("//div[@id = 'currency_id']/table/tr/td[4]")
-    return result[-1].text_content().strip()
+def get_kursi(unit="EUR"):
+    currency = Currency(unit)
+    return currency.get_currency()
 
 def start(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text="კეთილი იყოს თქვენი მობრძანება!")
