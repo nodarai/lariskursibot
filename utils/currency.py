@@ -25,5 +25,5 @@ class Currency():
     def get_date(self):
         return self._data["date"]
         
-    def get_all(self, unit):
+    def get_all(self):
         return self._data

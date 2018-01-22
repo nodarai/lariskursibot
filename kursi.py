@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # coding: utf-8
 import requests
 from telegram.ext import Updater
@@ -11,14 +11,18 @@ from sqlalchemy.orm.exc import NoResultFound
 from functools import partial
 from utils.subscribers import Subscriber, Base
 from utils.currency import Currency
+from utils.units import UNITS
 
 
 from os import environ as env;TOKEN=env.get("KURSIBOT_TOKEN")
 CURRENCIES = ("USD","EUR")
 
-def get_kursi(unit="EUR"):
+def get_kursi(bot, update, unit="EUR"):
     currency = Currency(unit)
-    return currency.get_currency()
+    data = currency.get_all()
+    msg = "%s თარიღით %s შეადგენს %s ლარს " % \
+        (data["date"], data["description"], data["currency"])
+    bot.send_message(chat_id=update.message.chat_id, text=msg)
 
 def start(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text="კეთილი იყოს თქვენი მობრძანება!")
@@ -26,25 +30,6 @@ def start(bot, update):
 def send_sorry(bot, update, error_message):
     msg = "დაფიქსირდა შეცდომა კურსის მოძიებისას.\n%s" % error_message
     bot.send_message(chat_id=update.message.chat_id, text=msg)
-
-def get_usd(bot, update):
-    print("Called usd command")
-    try:
-        msg = "დღეს 1 აშშ დოლარის ღირებულება შეადგენს %s ლარს" % get_kursi("USD")
-    except Exception as ex:
-        send_sorry(bot, update, repr(ex))
-        print(repr(ex))
-    else:
-        bot.send_message(chat_id=update.message.chat_id, text=msg)
-
-def get_eur(bot, update):
-    print("Called eur command")
-    try:
-        msg = "დღეს 1 ევროს ღირებულება შეადგენს %s ლარს" % get_kursi("EUR")
-    except Exception as ex:
-        send_sorry(bot, update, repr(ex))
-    else:
-        bot.send_message(chat_id=update.message.chat_id, text=msg)
 
 def initialize_db():
     engine = create_engine('sqlite:///subscribers.db')
@@ -90,10 +75,10 @@ def main():
     dispatcher.add_handler(start_handler)
     # Commands
     print("Adding handlers.")
-    usd_handler = CommandHandler('usd', get_usd)
-    dispatcher.add_handler(usd_handler)
-    eur_handler = CommandHandler('eur', get_eur)
-    dispatcher.add_handler(eur_handler)
+    for unit, commands in UNITS.items():
+        get_unit = partial(get_kursi, unit=unit)
+        for command in commands:
+            dispatcher.add_handler(CommandHandler(command, get_unit))
 
     dispatcher.add_handler(CommandHandler('subscribe', subscribe_ses))
     dispatcher.add_handler(CommandHandler('unsubscribe', unsubscribe_ses))
