@@ -9,6 +9,7 @@ from functools import partial
 from utils.subscribers import Subscriber, Base
 from utils.currency import Currency
 from utils.units import UNITS
+from utils.thread_schedule import ThreadSchedule
 
 
 from os import environ as env;TOKEN=env.get("KURSIBOT_TOKEN")
@@ -29,7 +30,8 @@ def send_sorry(bot, update, error_message):
     bot.send_message(chat_id=update.message.chat_id, text=msg)
 
 def initialize_db():
-    engine = create_engine('sqlite:///subscribers.db')
+    engine = create_engine('sqlite:///subscribers.db',
+                            connect_args={'check_same_thread': False})
     Base.metadata.bind = engine
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
@@ -60,6 +62,18 @@ def unsubscribe(bot, update, db_session):
         db_session.commit()
     bot.send_message(chat_id=chat_id, text=msg)
 
+def inform_subscribers(bot, db_session):
+    currencies = ("USD", "EUR")
+    datas = [Currency(c).get_all() for c in currencies]
+    msgs = ["%s თარიღით %s შეადგენს %s ლარს \n\n" % \
+            (data["date"], data["description"], data["currency"])
+            for data in datas]
+    msg = "".join(msgs)
+    subscribers = db_session.query(Subscriber).all()
+    for subscriber in subscribers:
+        print(subscriber.chat_id)
+        bot.send_message(chat_id=subscriber.chat_id, text=msg)
+
 def main():
     db_session = initialize_db()
     subscribe_ses = partial(subscribe, db_session=db_session)
@@ -79,7 +93,9 @@ def main():
 
     dispatcher.add_handler(CommandHandler('subscribe', subscribe_ses))
     dispatcher.add_handler(CommandHandler('unsubscribe', unsubscribe_ses))
-
+    # Create separete thread to run daily tasks
+    th = ThreadSchedule(partial(inform_subscribers, updater.bot, db_session))
+    th.start()
     # Start infinit loop to respond to requests
     print("Starting polling")
     updater.start_polling()
