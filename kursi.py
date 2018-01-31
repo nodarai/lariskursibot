@@ -23,7 +23,14 @@ def get_kursi(bot, update, unit="EUR"):
     bot.send_message(chat_id=update.message.chat_id, text=msg)
 
 def start(bot, update):
-    bot.send_message(chat_id=update.message.chat_id, text="კეთილი იყოს თქვენი მობრძანება!")
+    bot.send_message(chat_id=update.message.chat_id, text="""
+    კეთილი იყოს თქვენი მობრძანება!
+    შეგიძლიათ გამოიყენოთ შემდეგი ბრძანებები:
+    /subscribe - დოლარის და ევროს კურსის განახლების გამოწერა. ყოველდღიურად მიიღებთ შეტყობინებას მომდევნო დღის კურსის შესატყობად.
+    /unsubscribe - ზემოთ აღწერილი გამოწერის გაუქმება.
+    /usd ან /დოლარი - ამერიკული დოლარის უახლესი კურსის გაგება
+    /eur ან /ევრო - ევროს უახლესი კურსის გაგება.
+    """)
 
 def send_sorry(bot, update, error_message):
     msg = "დაფიქსირდა შეცდომა კურსის მოძიებისას.\n%s" % error_message
