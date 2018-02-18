@@ -10,10 +10,15 @@ from utils.subscribers import Subscriber, Base
 from utils.currency import Currency
 from utils.units import UNITS
 from utils.thread_schedule import ThreadSchedule
+from dotenv import load_dotenv, find_dotenv
+from os import environ as env
 
 
-from os import environ as env;TOKEN=env.get("KURSIBOT_TOKEN")
-CURRENCIES = ("USD","EUR")
+ENV_FILE = find_dotenv()
+if ENV_FILE:
+    load_dotenv(ENV_FILE)
+
+TOKEN=env.get("KURSIBOT_TOKEN")
 
 def get_kursi(bot, update, unit="EUR"):
     currency = Currency(unit)
