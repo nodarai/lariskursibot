@@ -9,7 +9,7 @@ class ThreadSchedule(Thread):
     def __init__(self, fn):
         super(ThreadSchedule, self).__init__()
         self.fn = fn
-        
+
     def run(self):
         """
         Run the thread which will schedule a task (self.fn) that will be
@@ -19,8 +19,7 @@ class ThreadSchedule(Thread):
         As the Georgian Time does not have winter/summer time in summer this
         time will be different.
         """
-        schedule.every().day.at("14:01").do(self.fn)
+        schedule.every().day.at("13:01").do(self.fn)
         while True:
             schedule.run_pending()
             time.sleep(1)
-
