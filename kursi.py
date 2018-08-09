@@ -24,7 +24,7 @@ def get_kursi(bot, update, unit="EUR"):
     currency = Currency(unit)
     data = currency.get_all()
     msg = "%s თარიღით %s შეადგენს %s ლარს " % \
-        (data["date"], data["description"], data["currency"])
+        (data["Date"], data["Name"], data["Rate"])
     bot.send_message(chat_id=update.message.chat_id, text=msg)
 
 def start(bot, update):
@@ -78,7 +78,7 @@ def inform_subscribers(bot, db_session):
     currencies = ("USD", "EUR")
     datas = [Currency(c).get_all() for c in currencies]
     msgs = ["%s თარიღით %s შეადგენს %s ლარს \n\n" % \
-            (data["date"], data["description"], data["currency"])
+            (data["Date"], data["Name"], data["Rate"])
             for data in datas]
     msg = "".join(msgs)
     subscribers = db_session.query(Subscriber).all()
