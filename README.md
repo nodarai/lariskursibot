@@ -64,5 +64,5 @@ If you are subscribed to daily updates you will receive the Telegram message wit
 The excellent [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) is used to make the bot alive
 
 ### Getting the rates
-NBG's SOAP web service is avalable at https://services.nbg.gov.ge/Rates/Service.asmx.
+NBG's SOAP web service is avalable at https://services.nbg.gov.ge/Rates/Service.asmx.  
 You can check the complete list of NBG's publicly available services at https://services.nbg.gov.ge/
