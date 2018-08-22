@@ -1,3 +1,19 @@
+<!-- TOC START min:1 max:3 link:true update:true -->
+- [LarisKursiBot](#lariskursibot)
+  - [Where to find the bot](#where-to-find-the-bot)
+  - [How to use it](#how-to-use-it)
+  - [Get the latest rate](#get-the-latest-rate)
+    - [How to check USD to GEL rate](#how-to-check-usd-to-gel-rate)
+    - [How to check EUR to GEL rate](#how-to-check-eur-to-gel-rate)
+  - [Subscribe to the daily rate](#subscribe-to-the-daily-rate)
+    - [Rates update](#rates-update)
+  - [Technology](#technology)
+    - [Bot](#bot)
+    - [Getting the rates](#getting-the-rates)
+
+<!-- TOC END -->
+
+
 # LarisKursiBot
 
 This is a Telegram Bot that simplifies the keeping track of the everyday convertion rate of Georgian Lari - GEL defined by National Bank of Georgia.
