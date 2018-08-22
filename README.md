@@ -8,7 +8,7 @@ This is a Telegram Bot that simplifies the keeping track of the everyday convert
 2. Or open the link https://t.me/LarisKursiBot
 
 
-## How to use it
+## How to use it
 
 Normally it should write to use the available commands when you connect to the bot. If it's not the case or you want to read again the instructions you can message to bot the next command:
 ```
