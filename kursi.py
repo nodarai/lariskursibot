@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
 from functools import partial
-from utils.subscribers import Subscriber, Base
+from utils.models import Subscriber, Base
 from utils.currency import Currency
 from utils.units import UNITS
 from utils.thread_schedule import ThreadSchedule
