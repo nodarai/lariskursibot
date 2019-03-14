@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
 from functools import partial
-from utils.models import Subscriber, Base
+from utils.models import Subscriber, Base, initialize_db
 from utils.currency import Currency
 from utils.units import UNITS
 from utils.thread_schedule import ThreadSchedule
@@ -40,14 +40,6 @@ def start(bot, update):
 def send_sorry(bot, update, error_message):
     msg = "დაფიქსირდა შეცდომა კურსის მოძიებისას.\n%s" % error_message
     bot.send_message(chat_id=update.message.chat_id, text=msg)
-
-def initialize_db():
-    engine = create_engine('sqlite:///subscribers.db',
-                            connect_args={'check_same_thread': False})
-    Base.metadata.bind = engine
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    return session
 
 def subscribe(bot, update, db_session):
     chat_id = update.message.chat_id

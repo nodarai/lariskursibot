@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # coding: utf-8
 from sqlalchemy import (
     Column,
@@ -8,8 +7,9 @@ from sqlalchemy import (
     Date,
     ForeignKey,
 )
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
 
@@ -26,6 +26,7 @@ class RefCurrency(Base):
     id = Column(Integer, primary_key=True)
     code = Column(String(3))
     name = Column(String(100))
+    quantity = Column(Integer)
 
 
 class Rate(Base):
@@ -35,7 +36,15 @@ class Rate(Base):
     rate = Column(Float)
     currency_id = Column(Integer, ForeignKey('refcurrency.id'))
     date = Column(Date)
-    quantity = Column(Integer)
+
+
+def initialize_db():
+    engine = create_engine('sqlite:///subscribers.db',
+                            connect_args={'check_same_thread': False})
+    Base.metadata.bind = engine
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    return session
 
 
 engine = create_engine('sqlite:///subscribers.db')
