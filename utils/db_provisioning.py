@@ -1,5 +1,6 @@
 # coding: utf-8
 import pandas as pd
+from units import UNITS
 from models import initialize_db, RefCurrency, Rate
 
 
@@ -11,16 +12,17 @@ _xlsx_conf = {
         'names': 3,
         'quantity': 4,
         'code': 5,
+        'values': 6,
     },
     'columns':  {
-        'Index': 'A',
+        'date': 'A',
         'EUR': 'D',
         'USD': 'P',
     }
 }
 
 def read_meta():
-    currencies = ['EUR', 'USD']
+    currencies = UNITS.keys() # ['EUR', 'USD']
     print('reading names')
     names = pd.read_excel(
         'exratesyearsgeo.xlsx',
@@ -59,18 +61,20 @@ def read_meta():
 
 
 def read_data():
-    columns = ['date', 'EUR', 'USD']
+    columns = _xlsx_conf['columns'].keys() # ['date', 'EUR', 'USD']
     print('reading data')
     data = pd.read_excel(
         'exratesyearsgeo.xlsx',
-        skiprows=_xlsx_conf['rows']['code'], # skip only 5 because 6 is header
-        usecols='A,D,P',
+        skiprows=_xlsx_conf['rows']['values'],
+        usecols= ','.join(_xlsx_conf['columns'].values()),
         header=None,
         names=columns
     )
     print('starting data insertion')
+
     eur_id = db_session.query(RefCurrency).filter(RefCurrency.code == 'EUR').one().id
     usd_id = db_session.query(RefCurrency).filter(RefCurrency.code == 'USD').one().id
+
     for i,row in data.iterrows():
         if not pd.isna(row['EUR']):
             rate_eur = Rate(
@@ -78,14 +82,16 @@ def read_data():
                 rate=row['EUR'],
                 date=row['date'].to_pydatetime()
             )
+            db_session.add(rate_eur)
         if not pd.isna(row['USD']):
             rate_usd = Rate(
                 currency_id=usd_id,
                 rate=row['USD'],
                 date=row['date'].to_pydatetime()
             )
-        db_session.add(rate_eur)
-        db_session.add(rate_usd)
+            db_session.add(rate_usd)
+
+    print('commiting changes')
     db_session.commit()
 
 
