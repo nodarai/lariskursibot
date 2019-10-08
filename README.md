@@ -18,7 +18,7 @@ This is a Telegram Bot that simplifies the keeping track of the everyday convert
 
 ## Where to find the bot
 
-1. You can type `LarisKursiBot` in Telegram's main window's search bar.
+1. You can type `LarisKursiBot` in the search bar of the main window of Telegram.
 2. Or open the link https://t.me/LarisKursiBot
 
 
