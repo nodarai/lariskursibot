@@ -12,6 +12,7 @@ from utils.units import UNITS
 from utils.thread_schedule import ThreadSchedule
 from dotenv import load_dotenv, find_dotenv
 from os import environ as env
+from utils.logger import logging
 
 
 ENV_FILE = find_dotenv()
@@ -42,6 +43,7 @@ def send_sorry(bot, update, error_message):
     bot.send_message(chat_id=update.message.chat_id, text=msg)
 
 def initialize_db():
+    logging.info('Initializing database')
     engine = create_engine('sqlite:///subscribers.db',
                             connect_args={'check_same_thread': False})
     Base.metadata.bind = engine
@@ -58,6 +60,7 @@ def subscribe(bot, update, db_session):
         db_session.add(subscriber)
         db_session.commit()
         msg = "თქვენ გამოიწერეთ ლარის კურსის განახლებები."
+        logging.debug('User subscribed to rate updates')
     bot.send_message(chat_id=chat_id, text=msg)
 
 def unsubscribe(bot, update, db_session):
@@ -69,6 +72,7 @@ def unsubscribe(bot, update, db_session):
         msg = "თქვენ არ გაქვთ გამოწერილი ლარის კურსის განახლებები."
     else:
         db_session.delete(subscriber)
+        logging.debug('User unsubscribed to rate updates')
         msg = "თქვენ გააუქმეთ ლარის კურსის განახლებების გამოწერა."
     finally:
         db_session.commit()
@@ -83,7 +87,7 @@ def inform_subscribers(bot, db_session):
     msg = "".join(msgs)
     subscribers = db_session.query(Subscriber).all()
     for subscriber in subscribers:
-        print(subscriber.chat_id)
+        logging.debug('Sending message to subscriber: %s' % subscriber.chat_id)
         bot.send_message(chat_id=subscriber.chat_id, text=msg)
 
 def main():
@@ -97,7 +101,7 @@ def main():
     start_handler = CommandHandler('start', start)
     dispatcher.add_handler(start_handler)
     # Commands
-    print("Adding handlers.")
+    logging.debug("Adding handlers.")
     for unit, commands in UNITS.items():
         get_unit = partial(get_kursi, unit=unit)
         for command in commands:
@@ -105,11 +109,12 @@ def main():
 
     dispatcher.add_handler(CommandHandler('subscribe', subscribe_ses))
     dispatcher.add_handler(CommandHandler('unsubscribe', unsubscribe_ses))
-    # Create separete thread to run daily tasks
+
+    logging.debug('Creating separate thread to run daily tasks')
     th = ThreadSchedule(partial(inform_subscribers, updater.bot, db_session))
     th.start()
     # Start infinit loop to respond to requests
-    print("Starting polling")
+    logging.info('Starting polling...')
     updater.start_polling()
 
 if __name__=="__main__":
