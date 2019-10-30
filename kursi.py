@@ -1,17 +1,18 @@
 #! /usr/bin/env python3
 # coding: utf-8
-from telegram.ext import Updater
-from telegram.ext import CommandHandler
+from os import environ as env
+from functools import partial
+
+from telegram.ext import Updater, CommandHandler
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
-from functools import partial
+from dotenv import load_dotenv, find_dotenv
+
 from utils.subscribers import Subscriber, Base
 from utils.currency import Currency
 from utils.units import UNITS
 from utils.thread_schedule import ThreadSchedule
-from dotenv import load_dotenv, find_dotenv
-from os import environ as env
 from utils.logger import logging
 
 
