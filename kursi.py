@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
 from dotenv import load_dotenv, find_dotenv
 
-from utils.subscribers import Subscriber, Base, initialize_db
+from utils.models import Subscriber, Base, initialize_db
 from utils.currency import Currency
 from utils.units import UNITS
 from utils.thread_schedule import ThreadSchedule
