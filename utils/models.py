@@ -12,7 +12,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 
-DB_FILENAME = 'sqlite:///subscribers.db'
+DB_FILENAME = 'sqlite:///lariskursi.db'
 
 Base = declarative_base()
 
