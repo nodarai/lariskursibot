@@ -73,6 +73,7 @@ class CurrencyReader():
                 code=codes[c][0]
             )
             self.db_session.add(rc)
+        logging.debug('commiting changes')
         self.db_session.commit()
 
 
