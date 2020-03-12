@@ -3,7 +3,7 @@
 UNITS = {
     "USD": ("usd", "დოლარი"),
     "EUR": ("eur", "ევრო"),
-    "AED": ("aed",),
-    "GBP": ("gbp",),
-    "AZN": ("azn", "manati")
+    # "AED": ("aed",),
+    # "GBP": ("gbp",),
+    # "AZN": ("azn", "manati")
 }
