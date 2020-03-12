@@ -9,7 +9,10 @@ from sqlalchemy import (
     create_engine,
 )
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+
+DB_FILENAME = 'sqlite:///subscribers.db'
 
 Base = declarative_base()
 
@@ -38,6 +41,15 @@ class Rate(Base):
     date = Column(Date)
 
 
-engine = create_engine('sqlite:///subscribers.db')
+def initialize_db():
+    engine = create_engine(DB_FILENAME,
+                            connect_args={'check_same_thread': False})
+    Base.metadata.bind = engine
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    return session
+
+
+engine = create_engine(DB_FILENAME)
 
 Base.metadata.create_all(engine)
