@@ -1,15 +1,22 @@
 #! /usr/bin/env python3
 # coding: utf-8
+from io import BytesIO
 from os import environ as env
 from functools import partial
 
+import pandas as pd
 from telegram.ext import Updater, CommandHandler
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, aliased
 from sqlalchemy.orm.exc import NoResultFound
 from dotenv import load_dotenv, find_dotenv
 
-from utils.models import Subscriber, Base, initialize_db
+from utils.models import (
+    Subscriber,
+    Rate,
+    RefCurrency,
+    initialize_db,
+)
 from utils.currency import Currency
 from utils.units import UNITS
 from utils.thread_schedule import ThreadSchedule
@@ -37,6 +44,7 @@ def start(bot, update):
     /unsubscribe - ზემოთ აღწერილი გამოწერის გაუქმება.
     /usd ან /დოლარი - ამერიკული დოლარის უახლესი კურსის გაგება
     /eur ან /ევრო - ევროს უახლესი კურსის გაგება.
+    /plot - ლარის კურსის გრაფიკი.
     """)
 
 def send_sorry(bot, update, error_message):
@@ -82,10 +90,32 @@ def inform_subscribers(bot, db_session):
         logging.debug('Sending message to subscriber: %s' % subscriber.chat_id)
         bot.send_message(chat_id=subscriber.chat_id, text=msg)
 
+def plot(bot, update, db_session):
+    logging.debug('Reading data')
+    r2 = aliased(Rate)
+    rates = db_session.query(Rate.date, Rate.rate, r2.rate)\
+        .filter(Rate.currency_id == 1)\
+        .join((r2, r2.date == Rate.date))\
+        .filter(r2.currency_id == 2)\
+        .order_by(Rate.date)
+
+    df = pd.DataFrame(rates, columns=('day', 'EUR', 'USD'))\
+        .set_index(keys='day', drop=True)
+
+    img_buf = BytesIO()
+    img_buf.name = 'plot.png'
+    fig = df.plot.line().get_figure()
+    fig.set_size_inches(20, 7)
+    fig.savefig(img_buf, format='png')
+    logging.debug("Chart ready. Sending it")
+    img_buf.seek(0)
+    bot.send_photo(chat_id=update.message.chat_id, photo=img_buf)
+
 def main():
     db_session = initialize_db()
     subscribe_ses = partial(subscribe, db_session=db_session)
     unsubscribe_ses = partial(unsubscribe, db_session=db_session)
+    plot_fun = partial(plot, db_session=db_session)
 
     updater = Updater(token=TOKEN)
     dispatcher = updater.dispatcher
@@ -101,6 +131,7 @@ def main():
 
     dispatcher.add_handler(CommandHandler('subscribe', subscribe_ses))
     dispatcher.add_handler(CommandHandler('unsubscribe', unsubscribe_ses))
+    dispatcher.add_handler(CommandHandler('plot', plot_fun))
 
     logging.debug('Creating separate thread to run daily tasks')
     th = ThreadSchedule(partial(inform_subscribers, updater.bot, db_session))
