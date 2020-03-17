@@ -1,5 +1,6 @@
 # coding: utf-8
 import pandas as pd
+from sqlalchemy import exists
 
 from units import UNITS
 from models import initialize_db, RefCurrency, Rate
@@ -67,12 +68,16 @@ class CurrencyReader():
             header=None
         )
         for c in currencies:
-            rc = RefCurrency(
-                name=names[c][0],
-                quantity=quantities[c][0],
-                code=codes[c][0]
-            )
-            self.db_session.add(rc)
+            currency_exists = self.db_session.query(
+                    exists().where(RefCurrency.code == codes[c][0])
+                ).scalar()
+            if not currency_exists:
+                rc = RefCurrency(
+                    name=names[c][0],
+                    quantity=quantities[c][0],
+                    code=codes[c][0]
+                )
+                self.db_session.add(rc)
         logging.debug('commiting changes')
         self.db_session.commit()
 
@@ -94,19 +99,29 @@ class CurrencyReader():
 
         for _, row in data.iterrows():
             if not pd.isna(row['EUR']):
-                rate_eur = Rate(
-                    currency_id=eur_id,
-                    rate=row['EUR'],
-                    date=row['date'].to_pydatetime()
-                )
-                self.db_session.add(rate_eur)
+                rate_exists = self.db_session.query(
+                    exists().where(Rate.currency_id == eur_id)
+                        .where(Rate.date == row['date'])
+                ).scalar()
+                if not rate_exists:
+                    rate_eur = Rate(
+                        currency_id=eur_id,
+                        rate=row['EUR'],
+                        date=row['date'].to_pydatetime()
+                    )
+                    self.db_session.add(rate_eur)
             if not pd.isna(row['USD']):
-                rate_usd = Rate(
-                    currency_id=usd_id,
-                    rate=row['USD'],
-                    date=row['date'].to_pydatetime()
-                )
-                self.db_session.add(rate_usd)
+                rate_exists = self.db_session.query(
+                    exists().where(Rate.currency_id == usd_id)
+                        .where(Rate.date == row['date'])
+                ).scalar()
+                if not rate_exists:
+                    rate_usd = Rate(
+                        currency_id=usd_id,
+                        rate=row['USD'],
+                        date=row['date'].to_pydatetime()
+                    )
+                    self.db_session.add(rate_usd)
 
         logging.debug('commiting changes')
         self.db_session.commit()

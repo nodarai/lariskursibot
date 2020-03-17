@@ -7,6 +7,7 @@ from sqlalchemy import (
     Date,
     ForeignKey,
     create_engine,
+    UniqueConstraint,
 )
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -27,7 +28,7 @@ class RefCurrency(Base):
     __tablename__ = "refcurrency"
 
     id = Column(Integer, primary_key=True)
-    code = Column(String(3))
+    code = Column(String(3), unique=True, nullable=False)
     name = Column(String(100))
     quantity = Column(Integer)
 
@@ -39,6 +40,8 @@ class Rate(Base):
     rate = Column(Float)
     currency_id = Column(Integer, ForeignKey('refcurrency.id'))
     date = Column(Date)
+
+    __table_args__ = (UniqueConstraint('currency_id', 'date'),)
 
 
 def initialize_db():
