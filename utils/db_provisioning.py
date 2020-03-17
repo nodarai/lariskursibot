@@ -1,4 +1,6 @@
 # coding: utf-8
+import argparse as ap
+
 import pandas as pd
 from sqlalchemy import exists
 
@@ -33,7 +35,8 @@ class CurrencyReader():
         }
     }
 
-    def __init__(self, excel_file):
+    def __init__(self, excel_file, config=None):
+        self._XLSX_CONF = config if config else self._XLSX_CONF
         self.excel_file = excel_file
         self.db_session = initialize_db()
 
@@ -128,8 +131,33 @@ class CurrencyReader():
 
 
 if __name__ == '__main__':
-    excel_file = 'exratesyearsgeo.xlsx'
-    currency_reader = CurrencyReader(excel_file)
+    parser = ap.ArgumentParser(
+        prog='DBprovisioning',
+        formatter_class=ap.RawDescriptionHelpFormatter,
+        description="""
+        Extracts exchange rates data from provided Excel file and writes
+        currencies and rates to database.
+        Input file containing the exchange rates can be downloaded from:
+        https://www.nbg.gov.ge/index.php?m=582
+        """
+    )
+    parser.add_argument(
+        'data_file',
+        help='Excel file containing historical data for GEL exchange rates.'
+    )
+    parser.add_argument(
+        '--config', '-c',
+        dest='config',
+        help='JSON file indicating where to find data in Excel file'
+    )
+    args = parser.parse_args()
+    logging.debug(
+        'Got {} as data file and {} as config file'.format(
+            args.data_file,
+            args.config
+        )
+    )
+    currency_reader = CurrencyReader(args.data_file, args.config)
     currency_reader.read_meta()
     currency_reader.read_data()
     currency_reader.db_session.close()
