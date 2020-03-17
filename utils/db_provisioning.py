@@ -1,5 +1,6 @@
 # coding: utf-8
 import argparse as ap
+from contextlib import ContextDecorator
 
 import pandas as pd
 from sqlalchemy import exists
@@ -9,7 +10,7 @@ from models import initialize_db, RefCurrency, Rate
 from logger import logging
 
 
-class CurrencyReader():
+class currency_reader(ContextDecorator):
     """
     Reads metada and real data from an excel file and writes it to database.
     The excel file represents the historical data of the GEL exchange rate.
@@ -38,7 +39,13 @@ class CurrencyReader():
     def __init__(self, excel_file, config=None):
         self._XLSX_CONF = config if config else self._XLSX_CONF
         self.excel_file = excel_file
+
+    def __enter__(self):
         self.db_session = initialize_db()
+        return self
+
+    def __exit__(self, *exc):
+        self.db_session.close()
 
     def read_meta(self):
         currencies = UNITS.keys() # ['EUR', 'USD']
@@ -157,7 +164,6 @@ if __name__ == '__main__':
             args.config
         )
     )
-    currency_reader = CurrencyReader(args.data_file, args.config)
-    currency_reader.read_meta()
-    currency_reader.read_data()
-    currency_reader.db_session.close()
+    with currency_reader(args.data_file, args.config) as cr:
+        cr.read_meta()
+        cr.read_data()
