@@ -1,0 +1,20 @@
+# This workflow will send POST request to deployment repository
+
+name: Send POST request to Deploy 
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  send-post:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Send POST request to deply repository
+      run: |
+        curl -X POST https://api.github.com/repos/nodarai/ansible-deployment/dispatches \
+          -H 'Accept: application/vnd.github.everest-preview+json' \
+          -u ${{ secrets.ACCESS_TOKEN }} \
+          --data '{"event_type": "deploy", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
