@@ -12,9 +12,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Send POST request to deply repository
+    - name: Send POST request to deploy repository
       run: |
         curl -X POST https://api.github.com/repos/nodarai/ansible-deployment/dispatches \
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
-          --data '{"event_type": "deploy", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
+          --data '{"event_type": "deploy", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'", "run_number": "${{ github.run_number }}" }}'
