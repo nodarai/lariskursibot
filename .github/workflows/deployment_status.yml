@@ -1,0 +1,31 @@
+# This workflow will send POST request to deployment repository
+
+name: Receive POST request with deployment status 
+
+on: [repository_dispatch]
+
+jobs:
+  deployment-status:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Receive POST request with depoyment status
+      if: github.event.action == 'deploy_status'
+      env:
+        RUN_NUMBER: "${{ github.event.client_payload.run_number }}"
+        STATUS: "${{ github.event.client_payload.status }}"
+      run: |
+        if [[ "$STATUS" == "Success" ]]
+          then
+          echo "Deployment workflow #$RUN_NUMBER succeded."
+        elif [[ "$STATUS" == "Cancelled" ]]
+          then
+            echo "Deployment workflow #$RUN_NUMBER cancelled."
+            exit 1
+        else
+          echo "Deployment workflow #$RUN_NUMBER failed."
+          exit 1
+        fi
+      shell: bash
