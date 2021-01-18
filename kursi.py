@@ -19,7 +19,6 @@ from utils.models import (
 )
 from utils.currency import Currency
 from utils.units import UNITS
-from utils.thread_schedule import ThreadSchedule
 from utils.logger import logging
 
 
@@ -135,9 +134,6 @@ def main():
     dispatcher.add_handler(CommandHandler('unsubscribe', unsubscribe_ses))
     dispatcher.add_handler(CommandHandler('plot', plot_fun))
 
-    logging.debug('Creating separate thread to run daily tasks')
-    th = ThreadSchedule(partial(inform_subscribers, updater.bot, db_session))
-    th.start()
     # Start infinit loop to respond to requests
     logging.info('Starting polling...')
     updater.start_polling()
