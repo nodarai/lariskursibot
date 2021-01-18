@@ -28,7 +28,7 @@ numpy==1.18.1
 pandas==1.0.1
 prompt-toolkit==3.0.10
 pylint==2.6.0
-pyparsing==2.4.6
+pyparsing==2.4.7
 python-dateutil==2.8.1
 python-dotenv==0.13.0
 python-telegram-bot==9.0.0
