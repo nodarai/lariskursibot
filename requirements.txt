@@ -31,7 +31,7 @@ pylint==2.6.0
 pyparsing==2.4.6
 python-dateutil==2.8.1
 python-dotenv==0.13.0
-python-telegram-bot==9.0.0
+python-telegram-bot==13.1
 pytz==2019.2
 requests==2.22.0
 requests-toolbelt==0.9.1
