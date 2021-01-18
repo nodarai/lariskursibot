@@ -29,6 +29,9 @@ if ENV_FILE:
 
 TOKEN=env.get("KURSIBOT_TOKEN")
 
+updater = Updater(token=TOKEN)
+
+
 def get_kursi(bot, update, unit="EUR"):
     currency = Currency(unit)
     data = currency.get_all()
@@ -78,7 +81,7 @@ def unsubscribe(bot, update, db_session):
         db_session.commit()
     bot.send_message(chat_id=chat_id, text=msg)
 
-def inform_subscribers(bot, db_session):
+def inform_subscribers(db_session):
     currencies = ("USD", "EUR")
     datas = [Currency(c).get_all() for c in currencies]
     msgs = ["%s თარიღით %s შეადგენს %s ლარს \n\n" % \
@@ -88,7 +91,7 @@ def inform_subscribers(bot, db_session):
     subscribers = db_session.query(Subscriber).all()
     for subscriber in subscribers:
         logging.debug('Sending message to subscriber: %s' % subscriber.chat_id)
-        bot.send_message(chat_id=subscriber.chat_id, text=msg)
+        updater.bot.send_message(chat_id=subscriber.chat_id, text=msg)
 
 def plot(bot, update, db_session):
     logging.debug('Reading data')
@@ -117,7 +120,6 @@ def main():
     unsubscribe_ses = partial(unsubscribe, db_session=db_session)
     plot_fun = partial(plot, db_session=db_session)
 
-    updater = Updater(token=TOKEN)
     dispatcher = updater.dispatcher
     # Add handler for start command
     start_handler = CommandHandler('start', start)
