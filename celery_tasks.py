@@ -2,7 +2,7 @@ from celery import Celery
 from celery.schedules import crontab
 from telegram.ext import Updater
 
-from kursi import inform_subscribers, TOKEN
+from kursi import inform_subscribers, TOKEN, updater
 from utils.models import DB_FILENAME, initialize_db
 
 
@@ -25,6 +25,5 @@ def setup_periodic_tasks(sender, **kwargs):
 @app.task
 def daily_informer():
     db_session = initialize_db()
-    updater = Updater(token=TOKEN)
-    inform_subscribers(updater.bot, db_session)
+    inform_subscribers(db_session)
     db_session.close()
