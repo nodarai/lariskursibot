@@ -1,0 +1,25 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: defusedxml
+    versions:
+    - 0.6.0
+    - 0.7.0
+  - dependency-name: pandas
+    versions:
+    - 1.2.1
+    - 1.2.2
+    - 1.2.3
+  - dependency-name: python-telegram-bot
+    versions:
+    - "13.1"
+    - "13.2"
+    - "13.3"
+  - dependency-name: urllib3
+    versions:
+    - 1.26.3
