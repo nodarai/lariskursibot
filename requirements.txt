@@ -1,7 +1,7 @@
 amqp==5.0.2
 appdirs==1.4.3
 astroid==2.4.2
-billiard==3.6.3.0
+billiard==4.0.1
 cached-property==1.5.2
 celery==5.0.5
 certifi==2019.6.16
