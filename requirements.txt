@@ -1,4 +1,4 @@
-amqp==5.0.2
+amqp==5.1.1
 appdirs==1.4.3
 astroid==2.12.10
 billiard==4.0.2
