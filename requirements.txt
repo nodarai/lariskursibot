@@ -22,7 +22,7 @@ kombu==5.0.2
 kombu-sqlalchemy==1.1.0
 lazy-object-proxy==1.4.3
 lxml==4.9.1
-matplotlib==3.2.0
+matplotlib==3.6.2
 mccabe==0.6.1
 numpy==1.23.3
 pandas==1.0.1
