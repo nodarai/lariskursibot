@@ -16,7 +16,7 @@ future==0.18.2
 idna==2.8
 importlib-metadata
 isodate
-isort==5.7.0
+isort==5.13.2
 kiwisolver
 kombu
 kombu-sqlalchemy
