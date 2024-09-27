@@ -1,0 +1,30 @@
+
+[tool.poetry]
+name = "lariskursibot"
+version = "0.1.0"
+description = ""
+authors = ["Nodar Kasradze <nod32arai@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+celery = "^5.4.0"
+pandas = "^2.2.2"
+matplotlib = "^3.9.1.post1"
+python-dotenv = "^1.0.1"
+sqlalchemy = "^2.0.32"
+zeep = "^4.2.1"
+python-telegram-bot = "9.0.0"
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.8.0"
+flake8 = "^7.1.1"
+isort = "^5.13.2"
+mypy = "^1.11.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
