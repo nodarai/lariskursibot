@@ -12,7 +12,7 @@ from sqlalchemy import (
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-DB_FILENAME = "sqlite:///lariskursi.db"
+from settings import settings
 
 Base = declarative_base()
 
@@ -45,13 +45,15 @@ class Rate(Base):
 
 
 def initialize_db():
-    engine = create_engine(DB_FILENAME, connect_args={"check_same_thread": False})
+    engine = create_engine(
+        settings.DB_FILENAME, connect_args={"check_same_thread": False}
+    )
     Base.metadata.bind = engine
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
     return session
 
 
-engine = create_engine(DB_FILENAME)
+engine = create_engine(settings.DB_FILENAME)
 
 Base.metadata.create_all(engine)

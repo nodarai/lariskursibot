@@ -2,9 +2,8 @@
 
 import logging
 
-
 logging.basicConfig(
-    format='%(asctime)s - %(levelname)s - %(module)s - %(funcName)s:%(lineno)s - %(message)s',
+    format="%(asctime)s - %(levelname)s - %(module)s - %(funcName)s:%(lineno)s - %(message)s",
     level=logging.DEBUG,
-    datefmt='%Y-%m-%d %H:%M:%S'
+    datefmt="%Y-%m-%d %H:%M:%S",
 )

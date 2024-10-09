@@ -2,13 +2,11 @@
 # coding: utf-8
 from functools import partial
 from io import BytesIO
-from os import environ as env
 
 import pandas as pd
-from dotenv import find_dotenv, load_dotenv
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import Session, aliased
 from telegram import Update
 from telegram.ext import (
     Application,
@@ -16,6 +14,7 @@ from telegram.ext import (
     ContextTypes,
 )
 
+from settings import settings
 from utils.currency import Currency
 from utils.logger import logging
 from utils.models import (
@@ -24,12 +23,6 @@ from utils.models import (
     initialize_db,
 )
 from utils.units import UNITS
-
-ENV_FILE = find_dotenv()
-if ENV_FILE:
-    load_dotenv(ENV_FILE)
-
-TOKEN: str = env.get("KURSIBOT_TOKEN")
 
 
 async def get_kursi(update: Update, context: ContextTypes.DEFAULT_TYPE, unit="EUR"):
@@ -62,7 +55,9 @@ async def send_sorry(
     await context.bot.send_message(chat_id=update.effective_chat.id, text=msg)
 
 
-async def subscribe(update: Update, context: ContextTypes.DEFAULT_TYPE, db_session):
+async def subscribe(
+    update: Update, context: ContextTypes.DEFAULT_TYPE, db_session: Session
+):
     chat_id = update.effective_chat.id
     if db_session.query(Subscriber).filter(Subscriber.chat_id == chat_id).count():
         msg = "თქვენ უკვე გამოწერილი გაქვთ განახლებები."
@@ -75,7 +70,9 @@ async def subscribe(update: Update, context: ContextTypes.DEFAULT_TYPE, db_sessi
     await context.bot.send_message(chat_id=chat_id, text=msg)
 
 
-async def unsubscribe(update: Update, context: ContextTypes.DEFAULT_TYPE, db_session):
+async def unsubscribe(
+    update: Update, context: ContextTypes.DEFAULT_TYPE, db_session: Session
+):
     chat_id = update.effective_chat.id
     try:
         subscriber = (
@@ -106,7 +103,7 @@ async def inform_subscribers(db_session, application):
         await application.bot.send_message(chat_id=subscriber.chat_id, text=msg)
 
 
-async def plot(update: Update, context: ContextTypes.DEFAULT_TYPE, db_session):
+async def plot(update: Update, context: ContextTypes.DEFAULT_TYPE, db_session: Session):
     logging.debug("Reading data")
     # Define subqueries for USD and EUR rates
     usd_rate_subquery = select(Rate).where(Rate.currency_id == 1).subquery()
@@ -127,7 +124,7 @@ async def plot(update: Update, context: ContextTypes.DEFAULT_TYPE, db_session):
     )
 
     img_buf = BytesIO()
-    img_buf.name = "plot.png"
+    img_buf.name = settings.PLOT_NAME
     fig = df.plot.line().get_figure()
     fig.set_size_inches(20, 7)
     fig.savefig(img_buf, format="png")
@@ -138,12 +135,12 @@ async def plot(update: Update, context: ContextTypes.DEFAULT_TYPE, db_session):
 
 
 def main():
-    db_session = initialize_db()
+    db_session: Session = initialize_db()
     subscribe_ses = partial(subscribe, db_session=db_session)
     unsubscribe_ses = partial(unsubscribe, db_session=db_session)
     plot_fun = partial(plot, db_session=db_session)
 
-    application = Application.builder().token(TOKEN).build()
+    application = Application.builder().token(settings.TOKEN).build()
 
     # Add handler for start command
     application.add_handler(CommandHandler("start", start))

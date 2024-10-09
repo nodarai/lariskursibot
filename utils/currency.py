@@ -2,7 +2,8 @@
 # coding: utf-8
 from zeep import Client as ZClient
 
-class Currency():
+
+class Currency:
     def __init__(self, unit="EUR"):
         client = ZClient("https://services.nbg.gov.ge/Rates/Service.asmx?wsdl")
         self.unit = unit
